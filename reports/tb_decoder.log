@@ -1,0 +1,17 @@
+# tb_decoder
+# date:      2026-10-21T10:25:51Z
+# verilator: Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905
+# commit:    7fea86d-dirty
+# host:      Darwin 24.6.0 arm64
+# build:     verilator --binary --timing -Wall -y . --quiet --Mdir obj_dir/tb_decoder --top-module tb_decoder tb_decoder.sv
+# run:       ./obj_dir/tb_decoder/Vtb_decoder   (from model/verilog)
+
+all tests passed
+- tb_decoder.sv:57: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.052 2026-09-05
+- Verilator: $finish at 281ns; walltime 0.023 s; speed 12.366 us/s
+- Verilator: cpu 0.023 s on 1 threads; allocated 1 MB
+
+# result:   PASS
+# exit:     0
+# duration: 0.03s

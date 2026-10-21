@@ -1,6 +1,6 @@
 # Pin constraints for bist_top on the PYNQ-Z2.
-# Pin numbers are from my memory of the TUL master XDC: check them against
-# the official PYNQ-Z2 master XDC before building.
+# Pin numbers checked against the official pynq-z2_v1.0.xdc (sysclk, sw[0],
+# led[0..3], btn[0]); ports renamed to match the bist_top port names.
 
 # 125 MHz system clock
 set_property -dict {PACKAGE_PIN H16 IOSTANDARD LVCMOS33} [get_ports clk]
@@ -18,3 +18,6 @@ set_property -dict {PACKAGE_PIN M14 IOSTANDARD LVCMOS33} [get_ports {led[3]}]
 
 # Button and switch are asynchronous, human-speed inputs (already 2-FF synchronised)
 set_false_path -from [get_ports {btn_rst sw_inject}]
+
+# LEDs are human-speed outputs with no external timing requirement
+set_false_path -to [get_ports {led[*]}]

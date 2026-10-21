@@ -1,2 +1,5 @@
 .DS_Store
 /model/verilog/obj_dir
+*.vcd
+*.fst
+__pycache__/

@@ -90,6 +90,11 @@ All testbenches are self-checking. Each prints `all tests passed` or a failure
 count and reports at most the first ten failures. Simulated with Verilator 5.052
 (`--binary --timing -Wall`).
 
+The saved output of the last run of every testbench is in
+[`reports/`](reports/), one log each, with the Verilator version, commit and
+exact commands that produced it. [`reports/SUMMARY.md`](reports/SUMMARY.md) is
+the table of results. Regenerate with `./run_sims.sh`.
+
 | Testbench | What it checks | Cases |
 |---|---|---|
 | `tb_syndrome` | Clean word gives `s = 0`, every single flip gives `s = address` and `odd = 1` | 17 |
@@ -169,11 +174,22 @@ Target: PYNQ-Z2 (Zynq-7020, `xc7z020clg400-1`), 125 MHz clock constraint (8 ns).
 | Worst hold slack | +0.175 ns |
 | Worst pulse width slack | +3.500 ns |
 | Failing endpoints | 0 of 126 |
-| LUTs / FFs | <!-- TODO from report_utilization --> |
-| Power | <!-- TODO from report_power --> |
+| LUTs / FFs | 40 LUTs (0.08%), 56 flip-flops (0.05%), in 22 slices (0.17%) |
+| Other resources | 0 BRAM, 0 DSP, 7 I/O, 1 BUFG |
+| Power (routed estimate) | 0.109 W total: 0.106 W static, 0.003 W dynamic; junction 26.3 C at 25 C ambient |
 
 All user timing constraints are met. I have not run implementation at a tighter
 clock, so I make no claim about maximum frequency.
+
+All figures are from the placed-and-routed design (Vivado 2021.1, slow-corner
+setup, fast-corner hold). The power figure uses Vivado's default activity
+assumptions, so its confidence is rated medium.
+
+The setup-critical path (slack 4.008 ns) runs from the sequencer's `t` register
+through the pair comparator (`i < j`) into the checker's fail register: 4 logic
+levels, with routing about 60% of the 4.009 ns delay. The encoder and decoder
+XOR trees are not the limiting path. The hold-critical path (0.175 ns) is the
+first stage of the `SW0` synchroniser.
 
 Pins (from the official PYNQ-Z2 constraints file):
 
@@ -184,9 +200,23 @@ Pins (from the official PYNQ-Z2 constraints file):
 | `sw_inject` | M20 (SW0) |
 | `led[3:0]` | M14, N16, P14, R14 |
 
+`report_io` confirms all seven ports sit on these pins as fixed LVCMOS33 I/O
+(the LEDs with 12 mA drive and slow slew). The only DRC warning is ZPS7-1 ("PS7
+block required"): the design uses only the programmable logic and the external
+125 MHz clock, so the Zynq processing system is not instantiated, and the design
+runs correctly on the board. `report_methodology` on the routed design reports
+zero violations (the LED outputs are covered by a false-path constraint).
+
 ## Reproducing
 
-Simulation (from the folder with the sources):
+Every testbench, with the logs written to `reports/`:
+
+```bash
+./run_sims.sh              # all six testbenches
+./run_sims.sh tb_decoder   # or just the named ones
+```
+
+Or one at a time by hand (from the folder with the sources):
 
 ```bash
 python3 gen_vectors.py                     # writes vectors.txt from the Python model
@@ -200,8 +230,7 @@ verilator --binary --timing -Wall --top-module tb_bist_top \
 
 Board: create a Vivado project for `xc7z020clg400-1`, add the design files and
 `pynq_z2.xdc`, set `bist_top` as the top module, then run synthesis,
-implementation and bitstream generation.
-<!-- TODO: add your Vivado version -->
+implementation and bitstream generation.  Built with Vivado 2021.1.
 
 ## Python reference model
 
