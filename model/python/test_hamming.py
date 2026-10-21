@@ -78,6 +78,14 @@ def test_minimum_distance_is_four():
     assert min(weights) == 4
 
 
+def test_decode_does_not_modify_its_input():
+    bad = encode(unpack(0x5A5, 11))
+    bad[6] ^= 1
+    before = list(bad)
+    decode(bad)
+    assert bad == before
+
+
 # ---------- the hardware's view ----------
 
 

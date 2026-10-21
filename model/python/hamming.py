@@ -41,6 +41,7 @@ def decode(cells):
     # 16 cells -> the 11 data bits, correcting a single error.
     # Raises ValueError on a double error, which cannot be corrected
 
+    cells = list(cells)  # make a copy so we don't modify the input
     s = syndrome(cells)
     odd = sum(cells) % 2
     if odd:  # single error
