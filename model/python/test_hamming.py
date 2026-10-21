@@ -73,16 +73,13 @@ def test_syndrome_xors_the_address_not_the_value():
 
 
 def test_minimum_distance_is_four():
-    """SECDED needs distance 4: correct any one error, detect any two.
-
-    Checked against the all-zero codeword, which is enough because the code is
-    linear: the distance between any two codewords is the weight of another one.
-    """
+    # SECDED needs distance 4: correct any one error, detect any two.
     weights = [sum(encode(data)) for data in ALL_DATA if any(data)]
     assert min(weights) == 4
 
 
 # ---------- the hardware's view ----------
+
 
 def test_hw_decode_flags_double_errors_and_passes_data_through():
     data = unpack(0x5A5, 11)
@@ -108,13 +105,9 @@ def test_hw_decode_reports_no_error_when_it_corrects():
 
 # ---------- documented limit ----------
 
-def test_three_errors_are_miscorrected_silently():
-    """Not a bug: SECDED guarantees nothing beyond two errors.
 
-    The README quotes this case, so the test keeps it honest. Flipping 3, 6 and 9
-    gives an odd parity and a syndrome of 12, so the decoder "corrects" healthy
-    cell 12 and returns wrong data with no error raised.
-    """
+def test_three_errors_are_miscorrected_silently():
+    # Not a bug: SECDED guarantees nothing beyond two errors.
     data = unpack(0x5A5, 11)
     bad = encode(data)
     for cell in (3, 6, 9):
@@ -125,6 +118,7 @@ def test_three_errors_are_miscorrected_silently():
 
 
 # ---------- helpers ----------
+
 
 def test_pack_and_unpack_round_trip():
     for value in (0, 1, 0x5A5, 0x7FF):
